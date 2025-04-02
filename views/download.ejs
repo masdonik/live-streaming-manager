@@ -1,0 +1,122 @@
+<div class="card">
+    <h2 class="card-title">
+        <i class="fas fa-download"></i> Download Video dari Google Drive
+    </h2>
+
+    <form action="/download/video" method="POST" onsubmit="return validateDownloadForm()">
+        <div class="form-group">
+            <label class="form-label" for="driveUrl">URL Google Drive</label>
+            <input type="text" class="form-control" id="driveUrl" name="url" 
+                   placeholder="Masukkan URL video dari Google Drive" required>
+            <small class="form-text" style="color: var(--text-secondary);">
+                Pastikan file video dapat diakses secara publik
+            </small>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-cloud-download-alt"></i> Download Video
+        </button>
+    </form>
+</div>
+
+<div class="card">
+    <h2 class="card-title">
+        <i class="fas fa-film"></i> Daftar Video
+    </h2>
+
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nama Video</th>
+                    <th>Ukuran</th>
+                    <th>Tanggal Download</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (typeof videos !== 'undefined' && videos.length > 0) { %>
+                    <% videos.forEach(video => { %>
+                        <tr>
+                            <td><%= video.name %></td>
+                            <td><%= video.size %></td>
+                            <td><%= new Date(video.downloadDate).toLocaleString('id-ID') %></td>
+                            <td>
+                                <button class="btn btn-primary" 
+                                        onclick="handleRename('<%= video.name %>')"
+                                        style="margin-right: 0.5rem;">
+                                    <i class="fas fa-edit"></i> Rename
+                                </button>
+                                <button class="btn btn-danger" 
+                                        onclick="handleDelete('<%= video.name %>')">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </td>
+                        </tr>
+                    <% }); %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="4" style="text-align: center;">
+                            <i class="fas fa-info-circle"></i> Belum ada video yang didownload
+                        </td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal untuk rename video -->
+<div id="renameModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Rename Video</h3>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label" for="newFileName">Nama Baru</label>
+                <input type="text" class="form-control" id="newFileName">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" onclick="confirmRename()">
+                <i class="fas fa-check"></i> Simpan
+            </button>
+            <button class="btn btn-danger" onclick="closeRenameModal()">
+                <i class="fas fa-times"></i> Batal
+            </button>
+        </div>
+    </div>
+</div>
+
+<%- contentFor('extraScripts') %>
+<script>
+// Tambahan JavaScript khusus untuk halaman download
+let currentFileName = '';
+
+function showRenameModal(fileName) {
+    currentFileName = fileName;
+    document.getElementById('newFileName').value = fileName;
+    document.getElementById('renameModal').style.display = 'flex';
+}
+
+function closeRenameModal() {
+    document.getElementById('renameModal').style.display = 'none';
+}
+
+function confirmRename() {
+    const newName = document.getElementById('newFileName').value;
+    if (newName && newName !== currentFileName) {
+        handleRename(currentFileName, newName);
+    }
+    closeRenameModal();
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('renameModal');
+    if (event.target === modal) {
+        closeRenameModal();
+    }
+}
+</script>

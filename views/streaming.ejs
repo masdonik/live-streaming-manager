@@ -1,0 +1,99 @@
+<div class="card">
+    <h2 class="card-title">
+        <i class="fas fa-video"></i> Live Streaming
+    </h2>
+
+    <form action="/stream/start" method="POST" onsubmit="return validateStreamingForm()">
+        <div class="form-group">
+            <label class="form-label" for="platform">Platform</label>
+            <select class="form-control" id="platform" name="platform" required>
+                <option value="">Pilih Platform</option>
+                <option value="facebook">Facebook</option>
+                <option value="youtube">YouTube</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="videoPath">Video</label>
+            <select class="form-control" id="videoPath" name="videoPath" required>
+                <option value="">Pilih Video</option>
+                <% if (typeof videos !== 'undefined' && videos.length > 0) { %>
+                    <% videos.forEach(video => { %>
+                        <option value="<%= video.name %>"><%= video.name %> (<%= video.size %>)</option>
+                    <% }); %>
+                <% } %>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="streamKey">Stream Key</label>
+            <input type="text" class="form-control" id="streamKey" name="streamKey" 
+                   placeholder="Masukkan stream key dari platform" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="duration">Durasi (menit, kosongkan untuk streaming tanpa batas)</label>
+            <input type="number" class="form-control" id="duration" name="duration" 
+                   placeholder="Masukkan durasi dalam menit" min="1">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="schedule">Jadwal Mulai (opsional)</label>
+            <input type="datetime-local" class="form-control" id="schedule" name="schedule">
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-play"></i> Mulai Streaming
+        </button>
+    </form>
+</div>
+
+<div class="card">
+    <h2 class="card-title">
+        <i class="fas fa-list"></i> Streaming Aktif
+    </h2>
+
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nama Video</th>
+                    <th>Platform</th>
+                    <th>Waktu Mulai</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="active-streams-body">
+                <% if (typeof activeStreams !== 'undefined' && activeStreams.length > 0) { %>
+                    <% activeStreams.forEach(stream => { %>
+                        <tr>
+                            <td><%= stream.videoName %></td>
+                            <td><%= stream.platform %></td>
+                            <td><%= new Date(stream.startTime).toLocaleString('id-ID') %></td>
+                            <td>
+                                <form action="/stream/stop" method="POST" style="display: inline;">
+                                    <input type="hidden" name="streamId" value="<%= stream.streamId %>">
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="fas fa-stop"></i> Stop
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    <% }); %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="4" class="text-center">
+                            <i class="fas fa-info-circle"></i> Tidak ada streaming aktif
+                        </td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<%- contentFor('extraScripts') %>
+<script>
+    // Set minimum datetime untuk jadwal
+    document.getElementById('schedule').min = new Date().toISOString().slice(0, 16);
+</script>
