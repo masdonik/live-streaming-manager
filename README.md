@@ -24,7 +24,7 @@ Aplikasi berbasis Node.js untuk mengelola live streaming video ke Facebook/YouTu
 
 1. Clone repositori ini:
 ```bash
-git clone <repository-url>
+git clone https://github.com/masdonik/live-streaming-manager.git
 cd live-streaming-manager
 ```
 
